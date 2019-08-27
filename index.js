@@ -14,11 +14,12 @@ const home = require('./routes/home');
 //const emp = require('./routes/emp');
 const moment = require('moment');
 moment().format();
+const validations = require('./validations/validations');
 
 //middleware - in-request processing pipeline
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(express.static('Public'));
+app.use(express.static('Public'));//http://localhost:3000/readme.pdf
 
 //middleware - Logging every incoming request
 app.use(logger);
@@ -92,7 +93,7 @@ Id not found: 404
 Success: 200
 */
 app.get('/api/employees/:id', (req, res) => {
-    const employee = employees.find(e => e.id === parseInt(req.params.id));
+    const employee = findEmployeeById(employees, req.params.id);
     if(!employee){
         errorLog(`Employee by id: ${req.params.id} note found!`);
         return res.status(404).send(`Employee by id ${req.params.id} not found!`);
@@ -130,33 +131,33 @@ app.post('/api/employees', (req, res) => {
 
     //role must be lackey, manager, vp, ceo case insensitive. 
     
-    if(!testValidRole(avaiableRoles, role)){
+    if(!validations.testValidRole(avaiableRoles, role)){
         errorLog(`Role is invalid`);
         return res.status(400).send("BAD REQUEST: Invalid role");
     }
     
     //only one CEO
-    if(!testCanAddRole(employees, role)){       
+    if(!validations.testCanAddRole(employees, role)){       
         errorLog(`Can't have more than one employee as the CEO`);
         return res.status(400).send("BAD REQUEST: Can't have more than one employee as the CEO");            
     }
 
     //hire date must be in format YYYY-MM-DD
-    if(!testHireDateFormat(hireDate)){        
+    if(!validations.testHireDateFormat(hireDate)){        
         errorLog(`Date format is incorrect. Expected format is YYYY-MM-DD`);
         return res.status(400).send("BAD REQUEST: Date format is incorrect. Expected format is YYYY-MM-DD");        
     }
 
     
     //hireDate always in past
-    if(!testHireDateInPast(hireDate)){
+    if(!validations.testHireDateInPast(hireDate)){
         errorLog(`Hire Date must be in past`);
         return res.status(400).send("BAD REQUEST: Hire Date must be in past");
     }
 
     var m1="";
     var m2 = "";
-    const newId = employees.length + 1;
+    const newId = new Date().getTime();//employees.length + 1;
     const employee = {
         id: newId,
         firstName: firstName,
@@ -229,7 +230,7 @@ Success: 200
 */
 app.put('/api/employees/:id', (req, res) => {
     //find emplpyee by id. if not found return 404
-    const employee = employees.find(e => e.id === parseInt(req.params.id));
+    const employee = findEmployeeById(employees, req.params.id);
     if(!employee){
         errorLog(`Employee by id: ${req.params.id} note found!`);
         return res.status(404).send(`Employee by id ${req.params.id} not found!`);
@@ -248,25 +249,25 @@ app.put('/api/employees/:id', (req, res) => {
     }
 
     //role must be lackey, manager, vp, ceo case insensitive. 
-    if(!testValidRole(avaiableRoles, role)){
+    if(!validations.testValidRole(avaiableRoles, role)){
         errorLog(`Role is invalid`);
         return res.status(400).send("BAD REQUEST: Invalid role");        
     }
 
     //only one CEO
-    if(!testCanAddRole(employees, role)){   
+    if(!validations.testCanAddRole(employees, role)){   
         errorLog(`Can't have more than one employee as the CEO`);
         return res.status(400).send("BAD REQUEST: Can't have more than one employee as the CEO");
     }       
 
     //hire date must be in format YYYY-MM-DD
-    if(!testHireDateFormat(hireDate)){              
+    if(!validations.testHireDateFormat(hireDate)){              
         errorLog(`Date format is incorrect. Expected format is YYYY-MM-DD`);
         return res.status(400).send("BAD REQUEST: Date format is incorrect. Expected format is YYYY-MM-DD");        
     }
 
     //hireDate always in past
-    if(!testHireDateInPast(hireDate)){
+    if(!validations.testHireDateInPast(hireDate)){
         errorLog(`Hire Date must be in past`);
         return res.status(400).send("BAD REQUEST: Hire Date must be in past");
     }
@@ -291,7 +292,7 @@ Id not found: 404
 Success: 204
 */
 app.delete('/api/employees/:id', (req, res) => {
-    const employee = employees.find(e => e.id === parseInt(req.params.id));
+    const employee = findEmployeeById(employees, req.params.id);
     if(!employee){
         errorLog(`Employee by id: ${req.params.id} note found!`);
         return res.status(404).send(`Employee by id ${req.params.id} not found!`);
@@ -303,6 +304,10 @@ app.delete('/api/employees/:id', (req, res) => {
 });
 
 //private methods
+
+function findEmployeeById(employees, id){
+    return employees.find(e => e.id === parseInt(id) );
+}
 
 function getM1(url, employee){
     return new Promise((resolve, reject) =>{
@@ -339,63 +344,8 @@ function getM2(url, employee){
     });
 }
 
+module.exports.findEmployeeById = findEmployeeById;
 
-
-//validation tests
-
-//test valid roles
-function testValidRole(avaiableRoles, role){
-    role = role.toUpperCase();
-    if(_.contains(avaiableRoles, role)){
-        return true;
-    }else{
-        return false;
-    }
-}
-
-//test only one CEO
-function testCanAddRole(employees, role){
-    var result = true;
-    if(role === 'CEO'){
-        employees.forEach (function (e){
-            if(e.role === 'CEO'){
-                result = false;
-            }
-        })
-    }
-    return result;
-}
-
-//test hireDate format YYYY-MM-YY
-function testHireDateFormat(hireDate){
-    if(moment(hireDate, "YYYY-MM-DD", true).isValid()){        
-        return true;       
-    }else{
-        return false;
-    }
-}
-
-//hireDate in past
-function testHireDateInPast(hireDateStr){
-    var today = new Date();
-    var hireDate = new Date(hireDateStr);
-    if(hireDate >= today){
-        return false;
-    }else{
-        return true;
-    }
-}
-
-module.exports.absolute = function(number){
-    if(number > 0) return number;
-    if(number < 0) return -number;
-    return 0;
-}
-
-module.exports.testValidRole = testValidRole;
-module.exports.testCanAddRole = testCanAddRole;
-module.exports.testHireDateFormat = testHireDateFormat;
-module.exports.testHireDateInPast = testHireDateInPast;
 
 
 
