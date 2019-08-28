@@ -59,13 +59,6 @@ const schema = {
 //valid roles
 const avaiableRoles = ["LACKEY", "MANAGER", "VP", "CEO"];
 
-
-//endpoint http://localhost:3000
-//HTTP Method: GET
-app.get('/', (req, res) => {
-    res.send('Hello World!!!');
-});
-
 /*
 Task: Get all employee
 Endpoint: http://localhost:3000/api/employees
@@ -309,7 +302,3 @@ function addEmployee(employee){
 }  
 
 module.exports.findEmployeeById = findEmployeeById;
-
-
-
-
