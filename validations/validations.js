@@ -1,9 +1,6 @@
 const moment = require('moment');
 moment().format();
 const _ = require('underscore');
-const employeesmodel = require('../model/employeemodel');
-const employees = employeesmodel.employees;
-
 
 //validation tests
 //test valid roles
