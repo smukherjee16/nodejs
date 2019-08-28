@@ -164,44 +164,21 @@ app.post('/api/employees', (req, res) => {
 
     }
 
-    //TODO get messages from function
-    
+    //TODO get messages from function    
     getM1("https://ron-swanson-quotes.herokuapp.com/v2/quotes", employee)    
-    .then(result => {employee.favoriteMessage1 = result; getM2("https://quotes.rest/qod", employee)})
-    .then(result => {employee.favoriteMessage2 = result; addEmployee(employee)})
+    .then(result => 
+        {employee.favoriteMessage1 = result; 
+            getM2("https://quotes.rest/qod", employee)
+            .then(result => 
+            {employee.favoriteMessage2 = result;
+                addEmployee(employee);
+                res.status(201).send(employee); })
+        })
     .catch(err => errorLog(err));
 
-   //callbacks printing in console
-    /*getM1("https://ron-swanson-quotes.herokuapp.com/v2/quotes", (message1) => {
-        console.log("Message: " + message1); 
-        m1 = message1;
-    });
-    console.log("M1: "  + m1);
-    getM2("https://quotes.rest/qod", (message2) => {
-        console.log("Message: " + message2);
-        m2 = message2;
-    });
-    console.log("M2: "  + m2);
-    */
-
-    /*const p3 = addEmployee(employee);
-    console.log("Adding Employee");
-    employees.push(employee);*/
-
-    
-    res.status(201).send(employee);
 });
 
-function addEmployee(employee){
-    return new Promise((resolve, reject) => {
-        console.log("before: " + employees.length);
-        employees.push(employee);
-        console.log("after: " + employees.length);
-        resolve;
-    })
-}
-
-    
+  
 
 /*
 Task: Update employee by Path Param: id
@@ -288,11 +265,11 @@ app.delete('/api/employees/:id', (req, res) => {
 });
 
 //private methods
-
 function findEmployeeById(employees, id){
     return employees.find(e => e.id === parseInt(id) );
 }
 
+//promise methods
 function getM1(url, employee){
     return new Promise((resolve, reject) =>{
     Request.get(url, (error, response, body) => {
@@ -300,33 +277,36 @@ function getM1(url, employee){
         if(error) {
             reject(error);
         }
-        debugLog("SEE BELOW");
-        debugLog(JSON.parse(body));
         m1 = body;
-        console.log("test m1:  " + m1);
+        debugLog("test m1:  " + m1);
         resolve( employee.favoriteMessage1 = m1);
         });
         });
     }
 
-
 function getM2(url, employee){
     return new Promise((resolve, reject) =>{
     Request.get(url, (error, response, body) => {
+        var m2 = "";
         if(error) {
             reject(error);
         }
-        debugLog("SEE BELOW");
-        debugLog(JSON.parse(body));
         var jsonParsed = JSON.parse(body);
-        var message = jsonParsed.contents.quotes[0].quote;
-        debugLog(jsonParsed);
-        debugLog(message);
-        console.log("test m2: " + message);
-        resolve( employee.favoriteMessage2 = message);
+        m2 = jsonParsed.contents.quotes[0].quote;
+        console.log("test m2: " + m2); 
+        resolve( employee.favoriteMessage2 = m2);
     });
     });
 }
+
+function addEmployee(employee){
+    return new Promise((resolve, reject) => {
+        //console.log("before: " + employees.length);
+        employees.push(employee);
+        //console.log("after: " + employees.length);
+        resolve;
+    })    
+}  
 
 module.exports.findEmployeeById = findEmployeeById;
 

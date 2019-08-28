@@ -47,9 +47,9 @@ function addeditEmployee()
 		var data = JSON.parse(this.response);
 
 		  if (request.status >= 200 && request.status < 400) {
-			   window.setTimeout(refreshtable(), 1000);
-			  //refreshtable();
-			  /*$("table#emp-list tbody").append('<tr class="item-'+data.id+'"><td>'+data.id+'</td><td>'+data.firstName+'</td><td>'+data.lastName+'</td><td>'+data.role+'</td><td>'+data.hireDate+'</td><td>'+data.favoriteMessage1+'</td><td>'+data.favoriteMessage2+'</td></tr>');*/
+
+
+			  $("table#emp-list tbody").append('<tr class="item-'+data.id+'"><td>'+data.id+'</td><td>'+data.firstName+'</td><td>'+data.lastName+'</td><td>'+data.role+'</td><td>'+data.hireDate+'</td><td>'+data.favoriteMessage1+'</td><td>'+data.favoriteMessage2+'</td></tr>');
 		 } else {
 			console.log('error');
 	  	}
