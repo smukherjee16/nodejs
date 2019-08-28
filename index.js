@@ -15,6 +15,8 @@ const home = require('./routes/home');
 const moment = require('moment');
 moment().format();
 const validations = require('./validations/validations');
+const employeesmodel = require('./model/employeemodel');
+const employees = employeesmodel.employees;
 
 //middleware - in-request processing pipeline
 app.use(express.json());
@@ -45,14 +47,6 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     debugLog(`Listening on port ${port}...`);
 });
-
-//load some default employees. Can set it to employee array also. 
-const employees = [
-    {id: 1, firstName: 'Mark', lastName: 'Anthony', role: 'VP', hireDate: '2017-12-10', 
-        favoriteMessage1: 'messaege1', favoriteMessage2: 'message2'},
-    {id: 2, firstName: 'Dave', lastName: 'Barton', role: 'MANAGER', hireDate: '2017-10-10', 
-        favoriteMessage1: 'messaege11', favoriteMessage2: 'message22'}
-]
 
 //validate schema
 const schema = {
@@ -177,17 +171,7 @@ app.post('/api/employees', (req, res) => {
     .then(result => {employee.favoriteMessage2 = result; addEmployee(employee)})
     .catch(err => errorLog(err));
 
-    /*const p2 = getM1("https://ron-swanson-quotes.herokuapp.com/v2/quotes");//getM2("https://quotes.rest/qod");
-    p2
-    .then(result => {
-        console.log("MESSAGE2", result);
-        employee.favoriteMessage2 = result;
-    })
-    .catch(err => errorLog(err));
-    */
-
-
-    //callbacks printing in console
+   //callbacks printing in console
     /*getM1("https://ron-swanson-quotes.herokuapp.com/v2/quotes", (message1) => {
         console.log("Message: " + message1); 
         m1 = message1;

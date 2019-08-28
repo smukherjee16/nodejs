@@ -1,7 +1,7 @@
 const indexjs = require('../index');
 const validations = require('../validations/validations');
 const avaiableRoles = ["LACKEY", "MANAGER", "VP", "CEO"];
-const employees = [
+const employeesTestData = [
     {id: 1, firstName: 'Mark', lastName: 'Anthony', role: 'MANAGER', hireDate: '2017-12-10', 
         favoriteMessage1: 'messaege1', favoriteMessage2: 'message2'},
     {id: 2, firstName: 'Dave', lastName: 'Barton', role: 'CEO', hireDate: '2017-10-10', 
@@ -25,12 +25,13 @@ describe('testValidRole', () => {
 
 describe('testCanAddRole', () => {
     it('Only one ceo test: Add CEO: FALSE', () => {
-        const result = validations.testCanAddRole(employees, 'CEO');
+        const result = validations.testCanAddRole(employeesTestData, 'CEO');
+        console.log(result);
         expect(result).toBe(false);
     });
     
     it('Only one ceo test: Add MANAGER: TRUE', () => {
-        const result = validations.testCanAddRole(employees, 'MANAGER');
+        const result = validations.testCanAddRole(employeesTestData, 'MANAGER');
         expect(result).toBe(true);
     });
     
@@ -63,13 +64,13 @@ describe('testHireDateInPast', () => {
 
 describe('findEmployeeById', () => {
     it('Valid id: TRUE' , () => {
-        const e1 = indexjs.findEmployeeById(employees, "1");
+        const e1 = indexjs.findEmployeeById(employeesTestData, "1");
         expect(e1).toEqual({'id': 1, 'firstName': 'Mark', 'lastName': 'Anthony', 'role': 'MANAGER', 'hireDate': '2017-12-10', 
         'favoriteMessage1': 'messaege1', 'favoriteMessage2': 'message2'});
     });
 
     it('Valid id: TRUE' , () => {
-        const e1 = indexjs.findEmployeeById(employees, "100");
+        const e1 = indexjs.findEmployeeById(employeesTestData, "100");
         expect(e1).toBe(undefined);
     });
   })
@@ -79,3 +80,6 @@ test('absolute', () => {
     const result = validations.absolute(1);
     expect(result).toBe(1);
 })
+
+
+
